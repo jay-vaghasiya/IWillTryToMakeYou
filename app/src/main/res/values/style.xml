@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="some_id">
+        <item name="android:textSize">34sp</item>
+        <item name="android:textColor">#646E82</item>
+        <item name="android:background">#ffffff</item>
+        <item name="android:fontFamily">Poppins</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:navigationBarColor">
+            @android:color/transparent
+        </item>
+        <item name="android:statusBarColor">
+            @android:color/transparent
+        </item>
+        <item name="android:windowLightStatusBar">
+            true
+        </item>
+    </style>
+    <style name="Theme.RemoveSplashScreenTheme" parent="@style/Theme.AppCompat.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+</resources>
