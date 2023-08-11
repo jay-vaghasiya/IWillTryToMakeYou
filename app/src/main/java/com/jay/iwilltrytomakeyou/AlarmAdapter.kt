@@ -7,9 +7,10 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jay.iwilltrytomakeyou.database.Alarm
-import kotlinx.coroutines.flow.Flow
 
-class AlarmAdapter(private var alarm: Flow<List<Alarm>>):RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>() {
+class AlarmAdapter:RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>() {
+
+    private var alarm:List<Alarm> = emptyList()
 
     inner class AlarmViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         private val tvLabel:TextView=itemView.findViewById(R.id.tvName)
@@ -23,9 +24,7 @@ class AlarmAdapter(private var alarm: Flow<List<Alarm>>):RecyclerView.Adapter<Al
             tvClock.text= alarm.dateTime.toString()
             tvDays.text= alarm.dayOfWeek.toString()
             tvMore.text=alarm.label
-
             slider.isChecked=alarm.isActive
-
         }
 
     }
@@ -40,10 +39,9 @@ class AlarmAdapter(private var alarm: Flow<List<Alarm>>):RecyclerView.Adapter<Al
 
     override fun onBindViewHolder(holder: AlarmAdapter.AlarmViewHolder, position: Int) {
         holder.bind(alarm[position])
-
-
     }
     override fun getItemCount(): Int=alarm.size
+
     fun updateData(newAlarms: List<Alarm>) {
         alarm=newAlarms
         notifyDataSetChanged()

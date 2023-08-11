@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "alarms")
 data class Alarm(
-@PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = true)
     val id:Int,
     val dateTime:Long,
     val dayOfWeek: MutableList<Int>,

@@ -11,18 +11,19 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_drawable"
-        android:elevation="12dp"
         android:layout_margin="5dp"
+        android:background="@drawable/gradient_drawable"
+        android:backgroundTint="@android:color/system_accent3_400"
+        android:elevation="12dp"
         app:cardCornerRadius="5dp"
-        >
-            <TextView
-                android:id="@+id/tvName"
+        tools:targetApi="s">
+
+        <TextView
+            android:id="@+id/tvName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:textSize="20sp"
-            />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/textClock"
@@ -42,28 +43,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_gravity="bottom"
-            android:layout_marginTop="70dp">
+            android:layout_marginTop="70dp"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/textDays"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="8"
-            android:layout_gravity="center"
-            android:textSize="20sp"
-            android:gravity="center"/>
+            <TextView
+                android:id="@+id/textDays"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="10"
+                android:gravity="center"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/tvMore"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
-                android:layout_weight="1"
                 android:layout_gravity="end"
+                android:layout_weight="1"
+                android:elevation="20dp"
                 android:background="@drawable/baseline_more_horiz_24"
-                android:clickable="true"
-                />
+                android:clickable="true" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </LinearLayout>

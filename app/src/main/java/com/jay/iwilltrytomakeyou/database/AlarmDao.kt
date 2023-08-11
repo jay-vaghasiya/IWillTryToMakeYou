@@ -3,22 +3,24 @@ package com.jay.iwilltrytomakeyou.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AlarmDao {
 
-    @Insert
-    fun insert(alarm: Alarm):Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(alarm: Alarm):Long
 
     @Update
-    fun update(alarm: Alarm)
+    suspend fun update(alarm: Alarm)
 
     @Delete
-    fun delete(alarm: Alarm)
+    suspend fun delete(alarm: Alarm)
 
     @Query("SELECT * FROM alarms")
-    fun getAllAlarms():List<Alarm>
+    fun getAllAlarmsLiveData(): Flow<List<Alarm>>
 
 }

@@ -20,7 +20,10 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             android:foregroundGravity="center"
             tools:listitem="@layout/item_alarm" />
 
@@ -35,7 +38,7 @@
             android:background="@drawable/add_btn"
             android:clickable="true"
             android:elevation="20dp"
-            app:shapeAppearance="@mipmap/add_round"
+            app:shapeAppearance="@drawable/add_btn"
             tools:ignore="ContentDescription" />
 
     </RelativeLayout>

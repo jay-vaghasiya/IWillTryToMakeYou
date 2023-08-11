@@ -13,35 +13,45 @@ import android.widget.LinearLayout
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jay.iwilltrytomakeyou.database.Alarm
-import com.jay.iwilltrytomakeyou.database.AlarmRepository
+import com.jay.iwilltrytomakeyou.database.AlarmViewModel
+import com.jay.iwilltrytomakeyou.database.AppDatabase
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var alarmAdapter: AlarmAdapter
     private lateinit var alarmRecyclerView: RecyclerView
-    private lateinit var alarmRepository: AlarmRepository
+    private lateinit var alarmViewModel: AlarmViewModel
+    private lateinit var alarmDatabase: AppDatabase
 
-
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint("MissingInflatedId", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
 
-        alarmRepository= AlarmRepository(this)
-        val alarms=alarmRepository.getAllAlarmsFlow()
+        alarmViewModel= ViewModelProvider(this)[AlarmViewModel::class.java]
 
         alarmRecyclerView=findViewById(R.id.recyclerView)
 
-        alarmAdapter=AlarmAdapter(alarms)
-        alarmRecyclerView.adapter=alarmAdapter
-        alarmRecyclerView.layoutManager=LinearLayoutManager(this)
-
+        alarmAdapter=AlarmAdapter()
+        alarmRecyclerView.apply {
+            adapter = alarmAdapter
+            layoutManager = LinearLayoutManager(this@MainActivity)
+        }
+            lifecycleScope.launch {
+                alarmViewModel.allAlarmLiveData.collect { alarms ->
+                    alarmAdapter.updateData(alarms)
+                    alarmAdapter.notifyDataSetChanged()
+                }
+            }
         val addAlarmButton:FloatingActionButton=findViewById(R.id.floatingActionButton)
         addAlarmButton.setOnClickListener{
             showAddAlarmDialog()
@@ -72,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             val hour=timePicker.hour
             val minute=timePicker.minute
 
-            val selectedDays= mutableListOf<Int>()
+            val selectedDays= ArrayList<Int>()
 
             for(i in 0 until daysCheckBoxes.childCount){
                 val checkBox=daysCheckBoxes.getChildAt(i) as CheckBox
@@ -80,12 +90,15 @@ class MainActivity : AppCompatActivity() {
                     selectedDays.add(i)
                 }
             }
-            val alarmDataTime=Alarm(0,calculateDataTime(hour,minute,selectedDays),
+
+            Alarm(0,calculateDataTime(hour,minute,selectedDays),
                 selectedDays,label, isActive = true)
-            alarmRepository.insertAlarm(alarmDataTime)
+                lifecycleScope.launch {
+                    alarmViewModel.allAlarmLiveData.collect { alarms ->
+                        alarmAdapter.updateData(alarms)
+                    }
+                }
 
-
-            alarmAdapter.updateData(alarmRepository.getAllAlarms())
             dialog.dismiss()
         }
         builder.setNegativeButton("Cancel"){dialog,_->
@@ -96,14 +109,16 @@ class MainActivity : AppCompatActivity() {
     }
     //------------------------------ Show add dialog ends ----------------------
 
+    @SuppressLint("ScheduleExactAlarm")
     private fun scheduleAlarm(alarmId: Long, alarmDataTime: Long) {
+
         val alarmManager=getSystemService(Context.ALARM_SERVICE)as AlarmManager
         val intent= Intent(this, AlarmReceiver::class.java)
         intent.putExtra("alarm_id",alarmId)
 
         val pendingIntent=PendingIntent.getBroadcast(this,alarmId.toInt(),intent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
         alarmManager.setExact(AlarmManager.RTC_WAKEUP,alarmDataTime,pendingIntent)
+
 
     }
     //-----------------------scheduleAlarm ends --------------------------------
@@ -130,8 +145,8 @@ class MainActivity : AppCompatActivity() {
 
         val daysOfWeek= listOf("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
 
-        daysOfWeek.forEachIndexed { _, day ->
-            val checkBox = getChildAt(day) as CheckBox
+        daysOfWeek.forEachIndexed { _, _ ->
+            val checkBox = getChildAt() as CheckBox
             checkBox.isChecked=true
         }
 
@@ -140,7 +155,7 @@ class MainActivity : AppCompatActivity() {
             val updatedHour=timeUpdatePicker.hour
             val updatedMinute=timeUpdatePicker.minute
 
-            val updatedDays= mutableListOf<Int>()
+            val updatedDays= java.util.ArrayList<Int>()
             for(i in 0 until daysUpdateCheckBoxes.childCount){
                 val checkBox=daysUpdateCheckBoxes.getChildAt(i) as CheckBox
                 if(checkBox.isChecked){
@@ -150,9 +165,10 @@ class MainActivity : AppCompatActivity() {
 
             val updateDateTime= calculateDataTime(updatedHour,updatedMinute,updatedDays)
             val updatedAlarm= Alarm(alarm.id,updateDateTime,updatedDays,updatedLabel, isActive = true)
-            alarmRepository.updateAlarms(updatedAlarm)
 
-            alarmAdapter.updateData(alarmRepository.getAllAlarms())
+            lifecycleScope.launch {
+                alarmViewModel.updateAlarm(updatedAlarm)
+            }
             dialog.dismiss()
         }
 
@@ -169,11 +185,14 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-private fun getChildAt(day: String) {
+private fun getChildAt() {
 
 }
 
-private fun calculateDataTime(selectedHour: Int, selectedMinute: Int,selectedDays:List<Int>): Long {
+private fun calculateDataTime(
+    selectedHour: Int, selectedMinute: Int,
+    selectedDays: MutableList<Int>
+): Long {
     val calendar=Calendar.getInstance()
     val currentDayOfWeek=calendar.get(Calendar.DAY_OF_WEEK)
 
