@@ -2,7 +2,9 @@ package com.jay.iwilltrytomakeyou.database
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class AlarmViewModel(application: Application):AndroidViewModel(application) {
 
@@ -10,17 +12,27 @@ class AlarmViewModel(application: Application):AndroidViewModel(application) {
 
     val allAlarmLiveData: Flow<List<Alarm>> = alarmRepository.getAllAlarmsLiveData()
 
-    suspend fun insertAlarm(alarm: Alarm){
-        alarmRepository.insertAlarm(alarm)
+    fun insertAlarm(alarm: Alarm){
+        viewModelScope.launch {
+            alarmRepository.insertAlarm(alarm)
+        }
+
     }
-    suspend fun updateAlarm(alarm: Alarm){
+    fun updateAlarm(alarm: Alarm){
+        viewModelScope.launch {
         alarmRepository.updateAlarm(alarm)
+        }
     }
-    suspend fun deleteAlarm(alarm: Alarm){
+    fun deleteAlarm(alarm: Alarm){
+        viewModelScope.launch {
         alarmRepository.deleteAlarm(alarm)
+
+        }
     }
 
-    suspend fun isActiveAlarm(alarm: Alarm){
+    fun isActiveAlarm(alarm: Alarm){
+        viewModelScope.launch {
         alarmRepository.toggleAlarmActive(alarm)
+        }
     }
 }

@@ -8,12 +8,12 @@ class AlarmApp:Application() {
         super.onCreate()
         alarmDatabase= Room.databaseBuilder(
             applicationContext,
-            alarmDatabase::class.java,
+            AppDatabase::class.java,
             "alarm_database"
         ).build()
     }
     companion object{
         lateinit var alarmDatabase: AppDatabase
-            private set
+        private set
     }
 }

@@ -26,8 +26,9 @@
         android:elevation="12dp"
         android:timePickerMode="spinner" />
 
+
+
     <LinearLayout
-        android:id="@+id/checkBoxes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
@@ -36,78 +37,96 @@
 
         >
 
-        <TextView
+        <CheckBox
             android:id="@+id/tvMonday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="30dp"
+            android:gravity="center"
+            android:layout_weight="1"
             android:clickable="true"
             android:elevation="2dp"
-            android:background="?android:attr/selectableItemBackground"
             android:text="@string/monday" />
 
 
-        <TextView
-            android:id="@+id/tvTuesday"
+        <CheckBox
+
+        android:id="@+id/tvTuesday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:layout_weight="1"
             android:clickable="true"
             android:elevation="2dp"
             android:text="@string/tuesday" />
 
-        <TextView
+        <CheckBox
             android:id="@+id/tvWednesday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
             android:clickable="true"
             android:elevation="2dp"
             android:text="@string/Wednesday" />
 
-        <TextView
+        <CheckBox
             android:id="@+id/tvThursday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+
+
             android:clickable="true"
             android:elevation="2dp"
             android:text="@string/thursday" />
 
-        <TextView
+        <CheckBox
             android:id="@+id/tvFriday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+
+
             android:clickable="true"
             android:elevation="2dp"
             android:text="@string/friday" />
 
-        <TextView
+        <CheckBox
             android:id="@+id/tvSaturday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="10dp"
+            android:layout_weight="1"
             android:clickable="true"
+            android:gravity="center"
             android:elevation="2dp"
             android:text="@string/saturday" />
 
-        <TextView
+        <CheckBox
             android:id="@+id/tvSunday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="10dp"
+            android:layout_weight="1"
             android:clickable="true"
+            android:gravity="center"
             android:elevation="2dp"
             android:text="@string/sunday" />
     </LinearLayout>
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pick_a_ringtone"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"/>
 </LinearLayout>
 

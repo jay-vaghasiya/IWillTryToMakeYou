@@ -8,6 +8,7 @@ data class Alarm(
     @PrimaryKey(autoGenerate = true)
     val id:Int,
     val dateTime:Long,
-    val dayOfWeek: MutableList<Int>,
+    val dayOfWeek: List<String>,
     val label:String,
-    var isActive:Boolean)
+    var isActive:Boolean
+    )

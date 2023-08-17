@@ -4,12 +4,12 @@ import androidx.room.TypeConverter
 
 class TypeConverter {
     @TypeConverter
-    fun fromList(dayOfWeek:MutableList<Int>):String {
-        return dayOfWeek.joinToString { "," }
+    fun fromList(list: List<String>): String {
+        return list.joinToString { ", " }// Convert ArrayList to comma-separated string
     }
 
     @TypeConverter
-    fun toList(dayOfWeekString: String):MutableList<Int>{
-        return dayOfWeekString.split(",").map { it.toInt() }.toMutableList()
+    fun toList(data: String): List<String> {
+        return data.split(", ")
     }
 }
