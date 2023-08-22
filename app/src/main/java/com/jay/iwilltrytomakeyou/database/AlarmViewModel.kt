@@ -8,31 +8,22 @@ import kotlinx.coroutines.launch
 
 class AlarmViewModel(application: Application):AndroidViewModel(application) {
 
-    private val alarmRepository=AlarmRepository(AlarmApp.alarmDatabase.alarmDao())
 
-    val allAlarmLiveData: Flow<List<Alarm>> = alarmRepository.getAllAlarmsLiveData()
+    val allAlarmLiveData: Flow<List<Alarm>> = AlarmApp.alarmRepository.getAllAlarmsLiveData()
 
-    fun insertAlarm(alarm: Alarm){
+
+    fun insertAlarm(alarm: Alarm) {
         viewModelScope.launch {
-            alarmRepository.insertAlarm(alarm)
+            AlarmApp.alarmRepository.insertAlarm(alarm)
         }
 
     }
-    fun updateAlarm(alarm: Alarm){
-        viewModelScope.launch {
-        alarmRepository.updateAlarm(alarm)
-        }
-    }
-    fun deleteAlarm(alarm: Alarm){
-        viewModelScope.launch {
-        alarmRepository.deleteAlarm(alarm)
 
-        }
-    }
-
-    fun isActiveAlarm(alarm: Alarm){
+    fun deleteAlarm(alarm: Alarm) {
         viewModelScope.launch {
-        alarmRepository.toggleAlarmActive(alarm)
+            AlarmApp.alarmRepository.deleteAlarm(alarm)
+
         }
     }
 }
+

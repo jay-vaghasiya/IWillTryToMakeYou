@@ -11,9 +11,13 @@ class AlarmApp:Application() {
             AppDatabase::class.java,
             "alarm_database"
         ).build()
+        alarmRepository= AlarmRepository(alarmDatabase.alarmDao())
     }
     companion object{
         lateinit var alarmDatabase: AppDatabase
+        private set
+
+        lateinit var alarmRepository: AlarmRepository
         private set
     }
 }
