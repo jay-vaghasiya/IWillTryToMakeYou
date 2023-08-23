@@ -14,6 +14,8 @@ class BootReceiver: BroadcastReceiver()
 
     override fun onReceive(context: Context?, intent: Intent?)
     {
+//        this condition check that if user restarted the phone that this condition execute
+
         if (intent?.action==Intent.ACTION_BOOT_COMPLETED)
         {
             val alarmId = intent.getLongExtra("alarm_id", -1)

@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity"
     android:layout_gravity="center"
-    android:background="@drawable/gradient_drawable">
+    android:background="@drawable/gradient">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -36,10 +36,10 @@
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="40dp"
             android:layout_marginEnd="40dp"
-            android:background="@drawable/add_btn"
+            android:background="@drawable/gradient"
             android:clickable="true"
             android:foreground="@drawable/add_btn"
-            tools:ignore="ContentDescription" />
+            />
 
     </RelativeLayout>
 </LinearLayout>

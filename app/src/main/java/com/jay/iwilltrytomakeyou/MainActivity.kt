@@ -18,15 +18,13 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
 
     private lateinit var alarmAdapter: AlarmAdapter
     private lateinit var alarmRecyclerView: RecyclerView
     private val alarmViewModel: AlarmViewModel by viewModels()
     private lateinit var alarmManager: AlarmManager
-    private var alarms= mutableListOf<Alarm>()
-
-
+    private var alarms = mutableListOf<Alarm>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +35,10 @@ class MainActivity : AppCompatActivity(){
 
         alarmRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        alarmAdapter = AlarmAdapter(alarms,alarmViewModel)
+        alarmAdapter = AlarmAdapter(alarms, alarmViewModel, this)
         alarmRecyclerView.adapter = alarmAdapter
+
+
 
         lifecycleScope.launch {
             alarmViewModel.allAlarmLiveData.collect { alarms ->
@@ -70,18 +70,21 @@ class MainActivity : AppCompatActivity(){
                 val label = labelEditText.text.toString()
                 val hour = timePicker.hour
                 val minute = timePicker.minute
-                val timeToHitAlarm= calculateDataTime(hour,minute)
-                val newAlarm=Alarm(
-                0, timeToHitAlarm, label, isActive = true
+                val unixTimestamp = calculateDataTime(hour, minute)
+                findViewById<TextView>(R.id.textClock)?.apply {
+                    text = timeLongToString(unixTimestamp)
+                }
+                val newAlarm = Alarm(
+                    0, unixTimestamp, label, isActive = true
                 )
 
-                val alarmDataTime=Calendar.getInstance()
-                alarmDataTime.timeInMillis = timeToHitAlarm
+                val alarmDataTime = Calendar.getInstance()
+                alarmDataTime.timeInMillis = unixTimestamp
 
                 alarmViewModel.insertAlarm(newAlarm)
-                alarmManager.scheduleAlarm(timeToHitAlarm, alarmDataTime)
-            dialog.dismiss()
-        }
+                alarmManager.scheduleAlarm(unixTimestamp, alarmDataTime)
+                dialog.dismiss()
+            }
         builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.dismiss()
         }
@@ -93,11 +96,7 @@ class MainActivity : AppCompatActivity(){
     private fun calculateDataTime(
         selectedHour: Int, selectedMinute: Int
     ): Long {
-        val tvClock: TextView? = findViewById(R.id.textClock)
         val calendar = Calendar.getInstance()
-        val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-        tvClock?.text = "$formattedTime"
 
         calendar.set(Calendar.HOUR_OF_DAY, selectedHour)
         calendar.set(Calendar.MINUTE, selectedMinute)
@@ -107,8 +106,19 @@ class MainActivity : AppCompatActivity(){
             calendar.add(Calendar.WEEK_OF_YEAR, 1)
         }
         return calendar.timeInMillis
+//        return formattedTime.format(calendar.time)
     }
 
+    private fun timeLongToString(time: Long): String {
+        val calendar = Calendar.getInstance()
+        val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+        calendar.time.time = time
+        return formattedTime.format(calendar.time)
+
+    }
+
+
+// ------------------------------------calculate time end------------------------------------------
 }
 
 

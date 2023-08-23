@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 class AlarmReceiver:BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
             val alarmId = intent.getLongExtra("extra_alarm_id", -1)
+//        notification manager for normal alarm
 
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
