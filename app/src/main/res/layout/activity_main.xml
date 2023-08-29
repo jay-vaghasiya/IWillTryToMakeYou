@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity"
     android:layout_gravity="center"
-    android:background="@drawable/gradient">
+    android:background="@android:color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"

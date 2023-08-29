@@ -1,12 +1,16 @@
 package com.jay.iwilltrytomakeyou
 
 import android.app.AlertDialog
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.TimePicker
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,9 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jay.iwilltrytomakeyou.database.Alarm
 import com.jay.iwilltrytomakeyou.database.AlarmViewModel
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,19 +27,25 @@ class MainActivity : AppCompatActivity() {
     private val alarmViewModel: AlarmViewModel by viewModels()
     private lateinit var alarmManager: AlarmManager
     private var alarms = mutableListOf<Alarm>()
+    private val PERMISSSION_TO_SHOW_NOTIFICATIONS=1
 
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        alarmManager = AlarmManager(this)
+        if(checkNotificationPemission()){
+            alarmManager = AlarmManager(this)
+        }else{
+            requestNotificationPermission()
+        }
         alarmRecyclerView = findViewById(R.id.recyclerView)
 
         alarmRecyclerView.layoutManager = LinearLayoutManager(this)
 
         alarmAdapter = AlarmAdapter(alarms, alarmViewModel, this)
         alarmRecyclerView.adapter = alarmAdapter
-
 
 
         lifecycleScope.launch {
@@ -52,11 +60,22 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun checkNotificationPemission(): Boolean {
+        return ContextCompat.checkSelfPermission(this,android.Manifest.permission.POST_NOTIFICATIONS)==
+                PackageManager.PERMISSION_GRANTED
+    }
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestNotificationPermission() {
+        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+            PERMISSSION_TO_SHOW_NOTIFICATIONS)
+    }
 
     //-------------------------------------------------onCreate ends--------------------------------
     private fun showAddAlarmDialog() {
 
         val dialogView = layoutInflater.inflate(R.layout.dialogue_set_alarm, null)
+        alarmManager = AlarmManager(this)
 
         val labelEditText = dialogView.findViewById<EditText>(R.id.etName)
         val timePicker = dialogView.findViewById<TimePicker>(R.id.timepicker)
@@ -71,9 +90,7 @@ class MainActivity : AppCompatActivity() {
                 val hour = timePicker.hour
                 val minute = timePicker.minute
                 val unixTimestamp = calculateDataTime(hour, minute)
-                findViewById<TextView>(R.id.textClock)?.apply {
-                    text = timeLongToString(unixTimestamp)
-                }
+
                 val newAlarm = Alarm(
                     0, unixTimestamp, label, isActive = true
                 )
@@ -106,17 +123,8 @@ class MainActivity : AppCompatActivity() {
             calendar.add(Calendar.WEEK_OF_YEAR, 1)
         }
         return calendar.timeInMillis
-//        return formattedTime.format(calendar.time)
-    }
-
-    private fun timeLongToString(time: Long): String {
-        val calendar = Calendar.getInstance()
-        val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
-        calendar.time.time = time
-        return formattedTime.format(calendar.time)
 
     }
-
 
 // ------------------------------------calculate time end------------------------------------------
 }

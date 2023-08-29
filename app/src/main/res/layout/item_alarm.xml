@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/gradient"
-    android:clipToOutline="true">
+    android:background="@android:color/white"
+    >
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
