@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if(checkNotificationPemission()){
+        if(checkNotificationPermission()){
             alarmManager = AlarmManager(this)
         }else{
             requestNotificationPermission()
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     }
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun checkNotificationPemission(): Boolean {
+    private fun checkNotificationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(this,android.Manifest.permission.POST_NOTIFICATIONS)==
                 PackageManager.PERMISSION_GRANTED
     }
@@ -70,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
             PERMISSSION_TO_SHOW_NOTIFICATIONS)
     }
+
+
 
     //-------------------------------------------------onCreate ends--------------------------------
     private fun showAddAlarmDialog() {
@@ -125,7 +127,6 @@ class MainActivity : AppCompatActivity() {
         return calendar.timeInMillis
 
     }
-
 // ------------------------------------calculate time end------------------------------------------
 }
 
