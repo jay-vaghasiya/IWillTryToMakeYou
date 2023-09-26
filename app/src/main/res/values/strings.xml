@@ -5,4 +5,6 @@
     <string name="iwilltrytowakeyou">IWillTryToWakeYou</string>
     <string name="the_alarm_app">The-Alarm-App</string>
     <string name="hmnn">(っ◔◡◔)っ</string>
+    <string name="add_alarm">Add Alarm</string>
+    <string name="no_alarm_available">No alarm Available</string>
 </resources>

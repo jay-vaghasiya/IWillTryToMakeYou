@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.EditText
 import android.widget.TimePicker
 import androidx.activity.viewModels
@@ -14,7 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.textview.MaterialTextView
 import com.jay.iwilltrytomakeyou.database.Alarm
 import com.jay.iwilltrytomakeyou.database.AlarmViewModel
 import kotlinx.coroutines.launch
@@ -41,12 +43,33 @@ class MainActivity : AppCompatActivity() {
             requestNotificationPermission()
         }
         alarmRecyclerView = findViewById(R.id.recyclerView)
-
         alarmRecyclerView.layoutManager = LinearLayoutManager(this)
 
         alarmAdapter = AlarmAdapter(alarms, alarmViewModel, this)
         alarmRecyclerView.adapter = alarmAdapter
 
+        val text=findViewById<MaterialTextView>(R.id.empty)
+
+        alarmAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                checkEmpty()
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                checkEmpty()
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                super.onItemRangeRemoved(positionStart, itemCount)
+                checkEmpty()
+            }
+
+            fun checkEmpty() {
+                text.visibility = (if (alarmAdapter.itemCount == 0) View.VISIBLE else View.GONE)
+            }
+        })
 
         lifecycleScope.launch {
             alarmViewModel.allAlarmLiveData.collect { alarms ->
@@ -54,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val addAlarmButton: FloatingActionButton = findViewById(R.id.floatingActionButton)
+        val addAlarmButton: ExtendedFloatingActionButton = findViewById(R.id.btAddForm)
         addAlarmButton.setOnClickListener {
             showAddAlarmDialog()
         }
@@ -70,9 +93,6 @@ class MainActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
             PERMISSSION_TO_SHOW_NOTIFICATIONS)
     }
-
-
-
     //-------------------------------------------------onCreate ends--------------------------------
     private fun showAddAlarmDialog() {
 
@@ -129,7 +149,3 @@ class MainActivity : AppCompatActivity() {
     }
 // ------------------------------------calculate time end------------------------------------------
 }
-
-
-
-

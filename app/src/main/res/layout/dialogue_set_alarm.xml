@@ -4,17 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
-    android:elevation="20dp"
-    android:orientation="vertical"
-    >
+    android:elevation="24dp"
+    android:orientation="vertical" >
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="3dp"
+        android:padding="8dp"
         android:autofillHints="name"
-        android:elevation="12dp"
         android:hint="@string/type_name"
         android:inputType="text"
         />
@@ -23,9 +21,8 @@
         android:id="@+id/timepicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="3dp"
+        android:padding="8dp"
         android:baselineAligned="false"
-        android:elevation="12dp"
         android:timePickerMode="spinner"
         />
 

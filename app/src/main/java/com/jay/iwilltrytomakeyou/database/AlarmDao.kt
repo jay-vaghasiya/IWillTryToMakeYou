@@ -10,15 +10,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AlarmDao {
 
-    @Query("SELECT * FROM alarms")
-    fun getAllAlarmsLiveData(): Flow<List<Alarm>>
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(alarm: Alarm):Long
+    fun insert(alarm: Alarm)
 
     @Delete
-    suspend fun delete(alarm: Alarm)
+    fun delete(alarm: Alarm)
 
-
-
+    @Query("SELECT * FROM alarms")
+    fun getAllAlarmsLiveData(): Flow<List<Alarm>>
 }

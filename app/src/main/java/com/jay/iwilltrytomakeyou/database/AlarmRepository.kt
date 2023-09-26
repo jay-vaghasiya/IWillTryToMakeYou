@@ -7,7 +7,7 @@ class AlarmRepository(private val alarmDao:AlarmDao){
 
         return alarmDao.getAllAlarmsLiveData()
     }
-    suspend fun insertAlarm(alarm: Alarm) {
+    fun insertAlarm(alarm: Alarm) {
         alarmDao.insert(alarm)
     }
 

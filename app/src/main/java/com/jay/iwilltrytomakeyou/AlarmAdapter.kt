@@ -5,9 +5,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textview.MaterialTextView
 import com.jay.iwilltrytomakeyou.database.Alarm
 import com.jay.iwilltrytomakeyou.database.AlarmViewModel
 import java.text.SimpleDateFormat
@@ -22,9 +21,9 @@ class AlarmAdapter(
 ) : RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>() {
 
     inner class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val tvLabel: TextView = itemView.findViewById(R.id.tvName)
-        private val tvClock: TextView = itemView.findViewById(R.id.textClock)
-        private val slider: Button = itemView.findViewById(R.id.switchOn)
+        private val tvLabel: MaterialTextView = itemView.findViewById(R.id.tvName)
+        private val tvClock: MaterialTextView = itemView.findViewById(R.id.textClock)
+        private val slider: MaterialTextView = itemView.findViewById(R.id.switchOn)
 
         fun bind(alarm: Alarm) {
             tvLabel.text = alarm.label
