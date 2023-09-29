@@ -7,4 +7,6 @@
     <string name="hmnn">(っ◔◡◔)っ</string>
     <string name="add_alarm">Add Alarm</string>
     <string name="no_alarm_available">No alarm Available</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
 </resources>

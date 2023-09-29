@@ -1,20 +1,25 @@
 package com.jay.iwilltrytomakeyou
 
-import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.View
 import android.widget.EditText
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.textview.MaterialTextView
 import com.jay.iwilltrytomakeyou.database.Alarm
@@ -28,27 +33,47 @@ class MainActivity : AppCompatActivity() {
     private lateinit var alarmRecyclerView: RecyclerView
     private val alarmViewModel: AlarmViewModel by viewModels()
     private lateinit var alarmManager: AlarmManager
-    private var alarms = mutableListOf<Alarm>()
-    private val PERMISSSION_TO_SHOW_NOTIFICATIONS=1
-
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if(checkNotificationPermission()){
+        //schedule exact alarm permission
+        if (checkPermission(android.Manifest.permission.SCHEDULE_EXACT_ALARM, this)) {
             alarmManager = AlarmManager(this)
-        }else{
-            requestNotificationPermission()
+        } else {
+            requestPermission(android.Manifest.permission.SCHEDULE_EXACT_ALARM, this)
         }
+
+        //notification permission
+        if (checkNotificationPermission(this)) {
+            Toast.makeText(this, "GOOD", Toast.LENGTH_SHORT).show()
+        } else {
+            requestNotificationPermission(this)
+        }
+
+        // Ignore battery optimizations
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+            val packageName = packageName
+            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                val intent = Intent()
+                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                intent.data = Uri.parse("package:$packageName")
+                startActivity(intent)
+            }
+        }
+
         alarmRecyclerView = findViewById(R.id.recyclerView)
         alarmRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        alarmAdapter = AlarmAdapter(alarms, alarmViewModel, this)
+        alarmAdapter = AlarmAdapter(alarmViewModel, this)
         alarmRecyclerView.adapter = alarmAdapter
 
-        val text=findViewById<MaterialTextView>(R.id.empty)
+        val text = findViewById<MaterialTextView>(R.id.empty)
 
         alarmAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
@@ -83,54 +108,58 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun checkNotificationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this,android.Manifest.permission.POST_NOTIFICATIONS)==
-                PackageManager.PERMISSION_GRANTED
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                alarmManager = AlarmManager(this)
+            } else {
+                Toast.makeText(this, "TFYS", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun requestNotificationPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-            PERMISSSION_TO_SHOW_NOTIFICATIONS)
-    }
-    //-------------------------------------------------onCreate ends--------------------------------
+
     private fun showAddAlarmDialog() {
 
-        val dialogView = layoutInflater.inflate(R.layout.dialogue_set_alarm, null)
+        val dialogBuilder = Dialog(this)
+        dialogBuilder.setContentView(R.layout.dialogue_set_alarm)
         alarmManager = AlarmManager(this)
 
-        val labelEditText = dialogView.findViewById<EditText>(R.id.etName)
-        val timePicker = dialogView.findViewById<TimePicker>(R.id.timepicker)
+        val labelEditText = dialogBuilder.findViewById<EditText>(R.id.etName)
+        val timePicker = dialogBuilder.findViewById<TimePicker>(R.id.timepicker)
+        val cancel = dialogBuilder.findViewById<MaterialButton>(R.id.btCancel)
+        val submit = dialogBuilder.findViewById<MaterialButton>(R.id.btSubmit)
 
+        submit.setOnClickListener {
+            val label = labelEditText.text.toString()
+            val hour = timePicker.hour
+            val minute = timePicker.minute
+            val unixTimestamp = calculateDataTime(hour, minute)
 
-        val builder = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setTitle("Add Alarm")
-            .setPositiveButton("Add") { dialog, _ ->
-                // set up positive button
-                val label = labelEditText.text.toString()
-                val hour = timePicker.hour
-                val minute = timePicker.minute
-                val unixTimestamp = calculateDataTime(hour, minute)
+            val newAlarm = Alarm(
+                0, unixTimestamp, label
+            )
 
-                val newAlarm = Alarm(
-                    0, unixTimestamp, label, isActive = true
-                )
+            val alarmDataTime = Calendar.getInstance()
+            alarmDataTime.timeInMillis = unixTimestamp
 
-                val alarmDataTime = Calendar.getInstance()
-                alarmDataTime.timeInMillis = unixTimestamp
-
+            lifecycleScope.launch {
                 alarmViewModel.insertAlarm(newAlarm)
-                alarmManager.scheduleAlarm(unixTimestamp, alarmDataTime)
-                dialog.dismiss()
             }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.dismiss()
+            alarmManager.scheduleAlarm(unixTimestamp, alarmDataTime, newAlarm)
+            dialogBuilder.dismiss()
         }
-        builder.create().show()
-        alarmAdapter.updateData(alarms)
+        cancel.setOnClickListener {
+            dialogBuilder.dismiss()
+        }
+        dialogBuilder.show()
     }
-    //------------------------------ Show add dialog ends ----------------------
 
     private fun calculateDataTime(
         selectedHour: Int, selectedMinute: Int
@@ -147,5 +176,8 @@ class MainActivity : AppCompatActivity() {
         return calendar.timeInMillis
 
     }
-// ------------------------------------calculate time end------------------------------------------
+
+    companion object {
+        private const val PERMISSION_REQUEST_CODE = 1
+    }
 }

@@ -6,33 +6,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.jay.iwilltrytomakeyou.database.Alarm
 import com.jay.iwilltrytomakeyou.database.AlarmViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 class AlarmAdapter(
-    private var alarm: List<Alarm>,
+
     private val alarmViewModel: AlarmViewModel,
     private val context: Context
 ) : RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>() {
-
+    private var alarm= mutableListOf<Alarm>()
     inner class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvLabel: MaterialTextView = itemView.findViewById(R.id.tvName)
         private val tvClock: MaterialTextView = itemView.findViewById(R.id.textClock)
-        private val slider: MaterialTextView = itemView.findViewById(R.id.switchOn)
+        private val slider: MaterialButton = itemView.findViewById(R.id.switchOn)
 
         fun bind(alarm: Alarm) {
             tvLabel.text = alarm.label
             tvClock.text = timeLongToString(alarm.dateTime)
-            val alarmManager = AlarmManager(context)
             slider.setOnClickListener {
+                val alarmManager = AlarmManager(context)
                 val alarmId = alarm.id
-                alarmManager.cancelAlarm(alarmId)
-                alarmViewModel.deleteAlarm(alarm)
+                GlobalScope.launch(Dispatchers.IO) {
+                    alarmViewModel.deleteAlarm(alarm)
+                }
+                alarmManager.cancelAlarm(alarmId,alarm)
+
             }
         }
     }
@@ -55,7 +62,8 @@ class AlarmAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateData(newAlarms: List<Alarm>) {
-        alarm = newAlarms
+        alarm.clear()
+        alarm.addAll(newAlarms)
         notifyDataSetChanged()
     }
 

@@ -9,5 +9,4 @@ data class Alarm(
     val id:Long,
     val dateTime: Long,
     val label:String,
-    var isActive:Boolean
 )

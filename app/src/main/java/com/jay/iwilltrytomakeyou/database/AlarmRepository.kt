@@ -1,18 +1,24 @@
 package com.jay.iwilltrytomakeyou.database
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class AlarmRepository(private val alarmDao:AlarmDao){
     fun getAllAlarmsLiveData(): Flow<List<Alarm>> {
 
         return alarmDao.getAllAlarmsLiveData()
     }
-    fun insertAlarm(alarm: Alarm) {
-        alarmDao.insert(alarm)
+    suspend fun insertAlarm(alarm: Alarm) {
+        withContext(Dispatchers.IO){
+            alarmDao.insert(alarm)
+        }
     }
 
     suspend fun deleteAlarm(alarm: Alarm) {
-        alarmDao.delete(alarm)
+        withContext(Dispatchers.IO){
+            alarmDao.delete(alarm)
+        }
     }
 
 }

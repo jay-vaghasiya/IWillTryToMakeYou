@@ -12,14 +12,14 @@ class AlarmViewModel(application: Application):AndroidViewModel(application) {
     val allAlarmLiveData: Flow<List<Alarm>> = AlarmApp.alarmRepository.getAllAlarmsLiveData()
 
 
-    fun insertAlarm(alarm: Alarm) {
+    suspend fun insertAlarm(alarm: Alarm) {
         viewModelScope.launch {
             AlarmApp.alarmRepository.insertAlarm(alarm)
         }
 
     }
 
-    fun deleteAlarm(alarm: Alarm) {
+    suspend fun deleteAlarm(alarm: Alarm) {
         viewModelScope.launch {
             AlarmApp.alarmRepository.deleteAlarm(alarm)
 
