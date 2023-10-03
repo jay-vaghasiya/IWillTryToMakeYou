@@ -10,6 +10,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.jay.iwilltrytomakeyou.database.Alarm
 import com.jay.iwilltrytomakeyou.database.AlarmViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -29,6 +30,7 @@ class AlarmAdapter(
         private val tvClock: MaterialTextView = itemView.findViewById(R.id.textClock)
         private val slider: MaterialButton = itemView.findViewById(R.id.switchOn)
 
+        @OptIn(DelicateCoroutinesApi::class)
         fun bind(alarm: Alarm) {
             tvLabel.text = alarm.label
             tvClock.text = timeLongToString(alarm.dateTime)
@@ -38,8 +40,7 @@ class AlarmAdapter(
                 GlobalScope.launch(Dispatchers.IO) {
                     alarmViewModel.deleteAlarm(alarm)
                 }
-                alarmManager.cancelAlarm(alarmId,alarm)
-
+                alarmManager.cancelAlarm(alarmId.toLong(),alarm)
             }
         }
     }

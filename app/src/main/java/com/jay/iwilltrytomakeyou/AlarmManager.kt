@@ -10,62 +10,55 @@ import android.os.Build
 import com.jay.iwilltrytomakeyou.database.Alarm
 import java.util.Calendar
 
+
 class AlarmManager(private val context: Context) {
 
-    fun scheduleAlarm(alarmId: Long, alarmDataTime: Calendar, alarm: Alarm) {
+     fun scheduleAlarm(alarmId: Long, alarmDataTime: Calendar, alarm: Alarm) {
 
         val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
-            action = "ALARM_TRIGGERED"
-            putExtra("alarm_id", alarmId)
+            putExtra(EXTRA_ALARM_ID, alarmId)
             putExtra("name", alarm.label)
         }
-
-        val pendingIntent:PendingIntent =
-            PendingIntent.getBroadcast(context, alarm.id.toInt(), alarmIntent, PendingIntent.FLAG_IMMUTABLE)
-
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    alarmDataTime.timeInMillis,
-                    pendingIntent
-                )
-
-
-            else -> {
+                alarmManager.canScheduleExactAlarms(
+                ).apply {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        alarmDataTime.timeInMillis,
+                        PendingIntent.getBroadcast(context,alarm.id,alarmIntent,PendingIntent.FLAG_IMMUTABLE
+                                or PendingIntent.FLAG_UPDATE_CURRENT)
+                    )
+                } else -> {
                 alarmManager.setExact(
                     AlarmManager.RTC_WAKEUP,
                     alarmDataTime.timeInMillis,
-                    pendingIntent
+                    PendingIntent.getBroadcast(context,alarm.id,alarmIntent,PendingIntent.FLAG_IMMUTABLE
+                            or PendingIntent.FLAG_UPDATE_CURRENT)
                 )
             }
         }
+         val receiver = ComponentName(context, BootReceiver::class.java)
 
-        val receiver = ComponentName(context, BootReceiver::class.java)
-
-        context.packageManager.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        )
+         context.packageManager.setComponentEnabledSetting(
+             receiver,
+             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+             PackageManager.DONT_KILL_APP
+         )
     }
 
     fun cancelAlarm(alarmId: Long, alarm: Alarm) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java).apply {
-            action = "ALARM_TRIGGERED" // Make sure to use the same action as in scheduleAlarm
+            action = "ALARM_TRIGGERED"
             putExtra("alarm_id", alarmId)
             putExtra("name", alarm.label)
         }
 
-        val pendingIntent = PendingIntent.getBroadcast(
-            context, 0, intent,
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        alarmManager.cancel(pendingIntent)
+        alarmManager.cancel(PendingIntent.getBroadcast(context,alarm.id,intent,PendingIntent.FLAG_IMMUTABLE
+                or PendingIntent.FLAG_UPDATE_CURRENT))
 
         val receiver = ComponentName(context, BootReceiver::class.java)
 
@@ -74,5 +67,9 @@ class AlarmManager(private val context: Context) {
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
             PackageManager.DONT_KILL_APP
         )
+    }
+
+    companion object {
+        const val EXTRA_ALARM_ID = "extra_alarm_id"
     }
 }

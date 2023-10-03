@@ -27,6 +27,7 @@ import com.jay.iwilltrytomakeyou.database.AlarmViewModel
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var alarmAdapter: AlarmAdapter
@@ -47,14 +48,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         //notification permission
-        if (checkNotificationPermission(this)) {
-            Toast.makeText(this, "GOOD", Toast.LENGTH_SHORT).show()
-        } else {
-            requestNotificationPermission(this)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            if (checkNotificationPermission(this)) {
+                Toast.makeText(this, "GOOD", Toast.LENGTH_SHORT).show()
+            } else {
+                requestNotificationPermission(this)
+            }
         }
 
         // Ignore battery optimizations
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
             val packageName = packageName
             val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -104,7 +107,9 @@ class MainActivity : AppCompatActivity() {
 
         val addAlarmButton: ExtendedFloatingActionButton = findViewById(R.id.btAddForm)
         addAlarmButton.setOnClickListener {
-            showAddAlarmDialog()
+
+
+      showAddAlarmDialog()
         }
 
     }
@@ -124,6 +129,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun showAddAlarmDialog() {
 
@@ -174,7 +180,6 @@ class MainActivity : AppCompatActivity() {
             calendar.add(Calendar.WEEK_OF_YEAR, 1)
         }
         return calendar.timeInMillis
-
     }
 
     companion object {

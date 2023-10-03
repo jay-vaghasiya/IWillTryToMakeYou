@@ -6,6 +6,7 @@ import android.content.Intent
 import com.jay.iwilltrytomakeyou.database.Alarm
 import com.jay.iwilltrytomakeyou.database.AlarmApp
 import com.jay.iwilltrytomakeyou.database.AlarmRepository
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,7 @@ import java.util.Calendar
 
 class BootReceiver : BroadcastReceiver() {
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == "android.intent.action.BOOT_COMPLETED") {
             GlobalScope.launch(Dispatchers.IO) {
@@ -42,7 +44,7 @@ class BootReceiver : BroadcastReceiver() {
         alarmDateTime.timeInMillis = alarm.dateTime
 
 
-        alarmManager.scheduleAlarm(alarm.id, alarmDateTime,alarm)
+        alarmManager.scheduleAlarm(alarm.id.toLong(), alarmDateTime,alarm)
     }
 
 }
